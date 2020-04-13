@@ -10,9 +10,14 @@ compiler:
   - gcc
 
 script:
-  - mkdir cmake-build
-  - cd cmake-build
-  - cmake ../
+  - mkdir cmake-build-client
+  - cd cmake-build-client
+  - cmake ../ -DCLIENT=1
+  - make
+  - cd ..
+  - mkdir cmake-build-server
+  - cd cmake-build-server
+  - cmake ../ -DSERVER=1
   - make
 
 notifications:
