@@ -30,12 +30,9 @@ void ServerMain::Close() {
 void ServerMain::GameHandler() {
   while (is_work_) {
     ClientAction client_action = socket_.WaitForClientAction();
-    std::cout << "HERE " << client_action.GetSocket() << std::endl;
     if (client_action.IsClosed()) {
-      std::cout << "HERE Erase" << client_action.GetSocket() << std::endl;
       situations_.erase(client_action.GetSocket());
     } else if (client_action.GetLetter() == Config::kStartSymbol) {
-      std::cout << "HERE Ok" << client_action.GetSocket() << std::endl;
       auto new_situation = new ClientSituation(ReturnRandomWords());
       mutex_.lock();
       situations_[client_action.GetSocket()] = new_situation;
@@ -47,19 +44,15 @@ void ServerMain::GameHandler() {
       WriteAll(client_action.GetSocket(),
                new_situation->GetCurrent().c_str(),
                new_situation->GetCurrent().size());
-      WriteAll(client_action.GetSocket(),
-               new_situation->GetCurrent().c_str(),
-               new_situation->GetCurrent().size());
-      std::cout << "HERE Send" << client_action.GetSocket() << std::endl;
     } else {
       mutex_.lock();
       auto iter = situations_.find(client_action.GetSocket());
       if (iter == situations_.end()) {
         continue;
       }
-      ClientSituation situation = *iter->second;
+      ClientSituation* situation = iter->second;
       mutex_.unlock();
-      if (situation.AddLetter(client_action.GetLetter())) {
+      if (situation->AddLetter(client_action.GetLetter())) {
         uint8_t size_to_send = Config::kWinSocketMessage.size();
         WriteAll(client_action.GetSocket(),
                  reinterpret_cast<const char *>(&size_to_send),
@@ -67,7 +60,7 @@ void ServerMain::GameHandler() {
         WriteAll(client_action.GetSocket(),
                  Config::kWinSocketMessage.c_str(),
                  Config::kWinSocketMessage.size());
-      } else if (situation.IsLose()) {
+      } else if (situation->IsLose()) {
         uint8_t size_to_send = Config::kLoseSocketMessage.size();
         WriteAll(client_action.GetSocket(),
                  reinterpret_cast<const char *>(&size_to_send),
@@ -76,13 +69,13 @@ void ServerMain::GameHandler() {
                  Config::kLoseSocketMessage.c_str(),
                  Config::kLoseSocketMessage.size());
       } else {
-        uint8_t size_to_send = situation.GetCurrent().size();
+        uint8_t size_to_send = situation->GetCurrent().size();
         WriteAll(client_action.GetSocket(),
                  reinterpret_cast<const char *>(&size_to_send),
                  1);
         WriteAll(client_action.GetSocket(),
-                 situation.GetCurrent().c_str(),
-                 situation.GetCurrent().size());
+                 situation->GetCurrent().c_str(),
+                 situation->GetCurrent().size());
       }
     }
   }

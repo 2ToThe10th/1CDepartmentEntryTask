@@ -47,25 +47,21 @@ ClientAction TCPSocketServer::WaitForClientAction() {
   for (;;) {
     int socket = epoll_.WaitOne(epoll_event);
 
-    std::cout << "Wait " << socket << std::endl;
-
     if (socket == accept_socket_) {
       int new_client = accept(accept_socket_, nullptr, nullptr);
-      std::cout << "New Client " << new_client << std::endl;
       epoll_.Add(new_client);
     } else {
       if (epoll_event == EPOLLHUP) {
         close(socket);
         return ClientAction::Closed();
       } else {
-        std::cout << socket << std::endl;
         char letter;
-//        try {
+        try {
           ReadAll(socket, &letter, sizeof(char));
-//        } catch (std::system_error& error) {
-//          close(socket);
-//          return ClientAction::Closed();
-//        }
+        } catch (std::system_error& error) {
+          close(socket);
+          return ClientAction::Closed();
+        }
         return ClientAction::Action(socket, letter);
       }
     }

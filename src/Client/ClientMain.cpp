@@ -28,11 +28,8 @@ void ClientMain::StartGame(const std::string &host, uint16_t port) {
 }
 
 void ClientMain::PlayOneGame() {
-  std::cout << "Send" << std::endl;
-
   socket_.WriteLetter(Config::kStartSymbol);
 
-  std::cout << "Send end" << std::endl;
   for (;;) {
     std::string read_message = socket_.Read();
     if (read_message == Config::kWinSocketMessage) {

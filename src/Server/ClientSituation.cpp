@@ -2,6 +2,7 @@
 // Created by 2ToThe10th on 13.04.2020.
 //
 
+#include <iostream>
 #include "ClientSituation.h"
 ClientSituation::ClientSituation(std::string to_guess): to_guess_(std::move(to_guess)) {
   current_.resize(to_guess_.size(), '*');
