@@ -33,7 +33,7 @@ void ClientMain::PlayOneGame() {
   for (;;) {
     std::string read_message = socket_.Read();
     if (read_message == Config::kWinSocketMessage) {
-      std::cout << Config::kWinMessage;
+      std::cout << Config::kWinMessage << std::endl;
       break;
     }
     if (read_message == Config::kLoseSocketMessage) {

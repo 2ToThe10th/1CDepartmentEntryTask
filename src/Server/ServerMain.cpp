@@ -37,13 +37,7 @@ void ServerMain::GameHandler() {
       mutex_.lock();
       situations_[client_action.GetSocket()] = new_situation;
       mutex_.unlock();
-      uint8_t size_to_send = new_situation->GetCurrent().size();
-      WriteAll(client_action.GetSocket(),
-               reinterpret_cast<const char *>(&size_to_send),
-               1);
-      WriteAll(client_action.GetSocket(),
-               new_situation->GetCurrent().c_str(),
-               new_situation->GetCurrent().size());
+      WriteString(client_action.GetSocket(), new_situation->GetCurrent());
     } else {
       mutex_.lock();
       auto iter = situations_.find(client_action.GetSocket());
@@ -53,29 +47,11 @@ void ServerMain::GameHandler() {
       ClientSituation* situation = iter->second;
       mutex_.unlock();
       if (situation->AddLetter(client_action.GetLetter())) {
-        uint8_t size_to_send = Config::kWinSocketMessage.size();
-        WriteAll(client_action.GetSocket(),
-                 reinterpret_cast<const char *>(&size_to_send),
-                 1);
-        WriteAll(client_action.GetSocket(),
-                 Config::kWinSocketMessage.c_str(),
-                 Config::kWinSocketMessage.size());
+        WriteString(client_action.GetSocket(), Config::kWinSocketMessage);
       } else if (situation->IsLose()) {
-        uint8_t size_to_send = Config::kLoseSocketMessage.size();
-        WriteAll(client_action.GetSocket(),
-                 reinterpret_cast<const char *>(&size_to_send),
-                 1);
-        WriteAll(client_action.GetSocket(),
-                 Config::kLoseSocketMessage.c_str(),
-                 Config::kLoseSocketMessage.size());
+        WriteString(client_action.GetSocket(), Config::kLoseSocketMessage);
       } else {
-        uint8_t size_to_send = situation->GetCurrent().size();
-        WriteAll(client_action.GetSocket(),
-                 reinterpret_cast<const char *>(&size_to_send),
-                 1);
-        WriteAll(client_action.GetSocket(),
-                 situation->GetCurrent().c_str(),
-                 situation->GetCurrent().size());
+        WriteString(client_action.GetSocket(), situation->GetCurrent());
       }
     }
   }

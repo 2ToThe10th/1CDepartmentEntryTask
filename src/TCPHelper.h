@@ -16,6 +16,8 @@ class InetAtonException : public std::exception {
 
 void WriteAll(int socket_fd, const char *buffer, size_t buffer_size);
 
+void WriteString(int socket_fd, const std::string& buffer);
+
 void ReadAll(int socket_fd, char *buffer, size_t buffer_size);
 
 #endif //INC_1CDEPARTMENTENTRYTASK_SRC_TCPHELPER_H_

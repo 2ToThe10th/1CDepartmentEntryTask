@@ -6,7 +6,7 @@
 #include <system_error>
 #include <sys/socket.h>
 #include <unistd.h>
-
+#include "TCPHelper.h"
 
 void WriteAll(int socket_fd, const char *buffer, size_t buffer_size) {
   size_t already_written = 0;
@@ -18,6 +18,16 @@ void WriteAll(int socket_fd, const char *buffer, size_t buffer_size) {
     already_written += was_written;
     buffer_size -= was_written;
   }
+}
+
+void WriteString(int socket_fd, const std::string& buffer) {
+  uint8_t size_to_send = buffer.size();
+  WriteAll(socket_fd,
+           reinterpret_cast<const char *>(&size_to_send),
+           1);
+  WriteAll(socket_fd,
+           buffer.c_str(),
+           buffer.size());
 }
 
 void ReadAll(int socket_fd, char *buffer, size_t buffer_size) {
